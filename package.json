@@ -1,0 +1,14 @@
+{
+  "name": "deth-proto",
+  "version": "1.0.0",
+  "description": "prototype for DETH protocol https://github.com/hildjj/draft-deth",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "SEE LICENSE IN http://trustee.ietf.org/docs/IETF-Trust-License-Policy.pdf",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express-api-server": "0.0.8"
+  }
+}
