@@ -28,25 +28,25 @@ TODO come up with a better way to prototype realistic behavior locally.
 Current records will be returned along with a list of edits the client
 is authorized to perform.
 ```
-  $ curl -X GET http://localhost:5000/deth/v1/
+  $ curl -X GET http://localhost:8000/deth/v1/
 ```
 Might return:
 ```
   {
     "A": {
-      "URI": "https://localhost:5000/deth/v1/A/",
+      "URI": "https://localhost:8000/deth/v1/A/",
       "methods": ["PUT", "DELETE"]
     },
     "AAAA": {
-      "URI": "https://localhost:5000/deth/v1/AAAA/",
+      "URI": "https://localhost:8000/deth/v1/AAAA/",
       "methods": ["PUT"]
     },
     "SRV": {
-      "URI": "https://localhost:5000/deth/v1/example.com/SRV/",
+      "URI": "https://localhost:8000/deth/v1/example.com/SRV/",
       "methods": ["PUT", "DELETE"]
     },
     "TYPE255": {
-      "URI": "https://localhost:5000/deth/v1/example.com/TYPE255/",
+      "URI": "https://localhost:8000/deth/v1/example.com/TYPE255/",
       "methods": ["PUT", "DELETE"]
     }
   }
@@ -66,12 +66,12 @@ Given a document `create.json` describing the changes:
 ```
 If a TTL is not sent with the request, a system default will be used. The response from this PUT will be the JSON form of the record, as inserted. This response MUST have the TTL included.
 ```
-  $ curl -d @create.json -X POST http://localhost:5000/deth/v1/AAAA/foo.example.com
+  $ curl -d @create.json -X POST http://localhost:8000/deth/v1/AAAA/foo.example.com
 ```
 
 ## Deleting Records
 ```
-  $ curl -X DELETE http://localhost:5000/deth/v1/AAAA/foo.example.com
+  $ curl -X DELETE http://localhost:8000/deth/v1/AAAA/foo.example.com
 ```
 
 ## Updating Records
