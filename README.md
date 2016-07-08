@@ -14,7 +14,7 @@ This will start a DNS server and a DETH HTTP server listening on port 8000.
 
 Normally this would be derived using a DNS query:
 ```
-  $ dig +short TXT \_deth.example.com
+  $ dig +short TXT _deth.example.com
   https://example.com/deth/v1/
 ```
 
