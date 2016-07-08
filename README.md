@@ -1,15 +1,15 @@
 Prototype for the DETH (DNS Editing Through HTTPS) spec:
 https://github.com/hildjj/draft-deth
 
-## Running
+# Running
 
   $ npm start
 
 This will start a DNS server and a DETH HTTP server listening on port 8000.
 
-## Example usage
+# Example usage
 
-# Determining the DETH Server for a Zone
+## Determining the DETH Server for a Zone
 
 Normally this would be derived using a DNS query:
 
@@ -21,7 +21,7 @@ for the `example.com` domain.
 
 TODO come up with a better way to prototype realistic behavior locally.
 
-# Getting All Records
+## Getting All Records
 
 Current records will be returned along with a list of edits the client
 is authorized to perform.
@@ -51,7 +51,7 @@ Might return:
 
 TODO support GET on individual record types too.
 
-# Creating Records
+## Creating Records
 
 Given a document `create.json` describing the changes:
 
@@ -66,14 +66,14 @@ If a TTL is not sent with the request, a system default will be used. The respon
 
   $ curl -d @create.json -X POST http://localhost:5000/deth/v1/AAAA/foo.example.com
 
-# Deleting Records
+## Deleting Records
 
   $ curl -X DELETE http://localhost:5000/deth/v1/AAAA/foo.example.com
 
-# Updating Records
+## Updating Records
 
 TODO, not specified yet.
 
-## Return Codes and Errors
+# Return Codes and Errors
 
 In general, errors use the approach from https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03
