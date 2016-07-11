@@ -58,7 +58,7 @@ function modifyZone(oldZone, newZone) {
   return newZone;
 }
 
-router.route('/deth/v1')
+router.route('/deth/v1/*')
   .get(function(req, res, next) {
     let output = generateOutput(cachedZone);
     res.json(output);
