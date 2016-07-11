@@ -9,6 +9,7 @@
   "license": "SEE LICENSE IN http://trustee.ietf.org/docs/IETF-Trust-License-Policy.pdf",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "dns-zonefile": "^0.1.19",
     "express-api-server": "0.0.8"
   }
 }
