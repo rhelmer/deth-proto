@@ -1,22 +1,37 @@
 ; Zone: 0.168.192.IN-ADDR.ARPA.
-; Exported  (yyyy-mm-ddThh:mm:ss.sssZ): 2014-09-22T21:10:36.698Z
+; Exported  (yyyy-mm-ddThh:mm:ss.sssZ): 2016-07-11T22:19:31.042Z
 
 $ORIGIN 0.168.192.IN-ADDR.ARPA.
 $TTL 3600
 
 ; SOA Record
-@           IN  SOA NS1.NAMESERVER.NET. HOSTMASTER.MYDOMAIN.COM.    (
-            1411420237   ;serial
-            3600     ;refresh
-            600  ;retry
-            604800   ;expire
-            86400    ;minimum ttl
+@	 		IN	SOA	NS1.NAMESERVER.NET.	HOSTMASTER.MYDOMAIN.COM.	(
+1411420237	 ;serial
+3600	 ;refresh
+600	 ;retry
+604800	 ;expire
+86400	 ;minimum ttl
 )
 
 ; NS Records
-@   IN  NS  NS1.NAMESERVER.NET.
-@   IN  NS  NS2.NAMESERVER.NET.
+@	IN	NS	NS1.NAMESERVER.NET.
+@	IN	NS	NS2.NAMESERVER.NET.
+
+; MX Records
+
+; A Records
+
+; AAAA Records
+
+; CNAME Records
 
 ; PTR Records
-1   IN  PTR HOST1.MYDOMAIN.COM.
-2   IN  PTR HOST2.MYDOMAIN.COM.
+1	IN	PTR	HOST1.MYDOMAIN.COM.
+2	IN	PTR	HOST2.MYDOMAIN.COM.
+
+; TXT Records
+
+; SRV Records
+
+; SPF Records
+
