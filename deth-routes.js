@@ -1,23 +1,25 @@
-var express = require('express');
-var errors = require('express-api-server').errors;
-var jsonParser = require('body-parser').json();
-var zonefile = require('dns-zonefile');
-var fs = require('fs');
+"use strict";
 
-var router = module.exports = express.Router();
+let express = require('express');
+let errors = require('express-api-server').errors;
+let jsonParser = require('body-parser').json();
+let zonefile = require('dns-zonefile');
+let fs = require('fs');
 
-var ZONEFILE = './zones/zone.txt';
+let router = module.exports = express.Router();
 
-var zoneTxt = fs.readFileSync(ZONEFILE, 'utf8');
-var zone = zonefile.parse(zoneTxt);
+let ZONEFILE = './zones/zone.txt';
+
+let zoneTxt = fs.readFileSync(ZONEFILE, 'utf8');
+let zone = zonefile.parse(zoneTxt);
 
 function modifyZone(oldZone, newZone) {
   // TODO validate input and modify zone based on input
-  var newZone = oldZone;
+  newZone = oldZone;
 
   // save new zone file to disk
-  var newRecordTxt = zonefile.generate(newZone);
-  var newRecord = zonefile.parse(newRecordTxt);
+  let newRecordTxt = zonefile.generate(newZone);
+  let newRecord = zonefile.parse(newRecordTxt);
   fs.readFileSync(ZONEFILE, newRecordTxt, 'utf8');
 
   // TODO reload DNS server
@@ -30,7 +32,7 @@ router.route('/deth/v1')
   .post(jsonParser, function(req, res, next) {
     if (!req.body) { return next(new errors.BadRequestError()); }
 
-    var newRecord = req.body;
+    let newRecord = req.body;
     modifyZone(zone, newRecord);
 
     res.status(201);
@@ -39,7 +41,7 @@ router.route('/deth/v1')
   .delete(jsonParser, function(req, res, next) {
     if (!req.body) { return next(new errors.BadRequestError()); }
 
-    var removedRecord = req.body;
+    let removedRecord = req.body;
     modifyZone(zone, removedRecord);
 
     res.status(200);
