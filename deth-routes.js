@@ -1,7 +1,7 @@
 "use strict";
 
 const ZONEFILE = './zones/zone.txt';
-const RTYPES = ['ns', 'aa', 'aaaa', 'srv', 'txt'];
+const RTYPES = ['ns', 'a', 'aaaa', 'srv', 'txt'];
 
 let express = require('express');
 let errors = require('express-api-server').errors;
