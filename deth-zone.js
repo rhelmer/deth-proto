@@ -167,9 +167,9 @@ class Zone {
     */
   get authorizedEdits() {
     let result = {};
-    this.rtypes.map(type => {
+    this.rtypes.map(rtype => {
       result[rtype] = {
-        "URI": `http://localhost:8000/deth/v1/${type}`,
+        "URI": `http://localhost:8000/deth/v1/${rtype}`,
         "methods": ["PUT", "DELETE"]
       };
     });
