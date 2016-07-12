@@ -30,11 +30,23 @@ class Zone {
     let rtype = split[3].toLowerCase();
     let id = split[4];
 
-    this.cachedZone[rtype].map(entry => {
-      if (entry.name && entry.name == id) {
-        delete this.cachedZone[rtype][entry];
+    if (this.rtypes.indexOf(rtype) == -1) {
+      return {"error": "invalid record type"};
+    }
+
+    if (Object.keys(this.cachedZone).indexOf(rtype) == -1 ||
+        this.cachedZone[rtype].length == 0) {
+      return {"error": "no record types in zone"};
+    }
+
+    for (let i = this.cachedZone[rtype].length - 1; i >= 0; i--) {
+      console.log(this.cachedZone[rtype]);
+      if (this.cachedZone[rtype][i] &&
+          "name" in this.cachedZone[rtype][i] &&
+          this.cachedZone[rtype][i]["name"] == id) {
+        delete this.cachedZone[rtype][i];
       }
-    });
+    }
 
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
