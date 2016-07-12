@@ -39,19 +39,25 @@ class Zone {
       return {"error": "no record types in zone"};
     }
 
+    let changed = false;
     for (let i = this.cachedZone[rtype].length - 1; i >= 0; i--) {
       if (this.cachedZone[rtype][i] &&
           "name" in this.cachedZone[rtype][i] &&
           this.cachedZone[rtype][i]["name"] == id) {
         delete this.cachedZone[rtype][i];
+        changed = true;
       }
+    }
+
+    if (!changed) {
+      return {"error": "no matching records found in zone"};
     }
 
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
 
     // TODO reload DNS server
-    return this.cachedZone;
+    return {"message": `deleted ${id} from ${rtype}`};
   }
 
   /**
