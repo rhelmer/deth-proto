@@ -52,11 +52,32 @@ class Zone {
     *          as JSON.
     */
   get generateOutput() {
+    /* FIXME return a valid result object:
+       {
+        "A": {
+          "URI": "https://example.com/deth/v1/A/",
+          "methods": ["PUT", "DELETE"]
+        },
+        "AAAA": {
+          "URI": "https://example.com/deth/v1/AAAA/",
+          "methods": ["PUT"]
+        },
+        "SRV": {
+          "URI": "https://example.com/deth/v1/example.com/SRV/",
+          "methods": ["PUT", "DELETE"]
+        },
+        "TYPE255": {
+          "URI": "https://example.com/deth/v1/example.com/TYPE255/",
+          "methods": ["PUT", "DELETE"]
+        }
+      }
+
+    */
     let output = {};
 
-    this.rtypes.map(t => {
-      if (t in this.cachedZone) {
-        output[t] = this.cachedZone[t];
+    this.rtypes.map(type => {
+      if (type in this.cachedZone) {
+        output[type] = this.cachedZone[type];
       }
     });
 
