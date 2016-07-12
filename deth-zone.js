@@ -40,7 +40,6 @@ class Zone {
     }
 
     for (let i = this.cachedZone[rtype].length - 1; i >= 0; i--) {
-      console.log(this.cachedZone[rtype]);
       if (this.cachedZone[rtype][i] &&
           "name" in this.cachedZone[rtype][i] &&
           this.cachedZone[rtype][i]["name"] == id) {
