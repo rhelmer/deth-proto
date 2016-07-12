@@ -8,6 +8,11 @@ module.exports = function create(opt) {
   return new Zone(opt);
 }
 
+/**
+  * A Zone object represents a DNS zone.
+  * It provides methods to modify the records in a zone, and to generateOutput
+  * an object which can be serialized to spec-compliant DETH JSON.
+  */
 class Zone {
   constructor(zoneFile) {
     this.zoneFile = zoneFile;
