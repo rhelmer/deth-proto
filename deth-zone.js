@@ -23,14 +23,13 @@ class Zone {
   }
 
   delete(record) {
-    console.log("rhelmer", record);
+    // FIXME use a nicer parser, if destrucuring is not an option
     let split = record.split('/');
     let proto = split[1];
     let version = split[2];
     let rtype = split[3].toLowerCase();
     let id = split[4];
 
-    console.log("rhelmer",proto,version,rtype,id);
     this.cachedZone[rtype].map(entry => {
       if (entry.name && entry.name == id) {
         delete this.cachedZone[rtype][entry];
