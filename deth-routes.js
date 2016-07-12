@@ -12,24 +12,29 @@ let zone = dethZone(ZONEFILE);
 
 router.route('/deth/v1/*')
   .get(function(req, res, next) {
-    let output = zone.generateOutput;
+    let output = zone.authorizedEdits;
     res.json(output);
   })
   .post(jsonParser, function(req, res, next) {
-    if (!req.body) { return next(new errors.BadRequestError()); }
+    if (!req.body) {
+      return next(new errors.BadRequestError());
+    }
 
-    let newRecord = req.body;
-    zone.modify(newRecord);
+    let record = req.path;
+    let changes = req.body;
+    let output = zone.modify(record, changes);
 
     res.status(201);
-    res.json(zone.generateOutput);
+    res.json(output);
   })
   .delete(jsonParser, function(req, res, next) {
-    if (!req.body) { return next(new errors.BadRequestError()); }
+    if (!req.body) {
+      return next(new errors.BadRequestError());
+    }
 
-    let removedRecord = req.body;
-    zone.modify(removedRecord);
+    let record = req.path;
+    let output = zone.delete(record);
 
     res.status(200);
-    res.json(zone.generateOutput);
+    res.json(output);
   });
