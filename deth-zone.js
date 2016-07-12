@@ -22,6 +22,13 @@ class Zone {
     this.cachedZone = zonefile.parse(zoneTxt);
   }
 
+  /**
+    * Deletes a record from a zone.
+    *
+    * @param record - the full path to the record to remove.
+    * @returns a json error or message with details on actions taken.
+    */
+
   delete(record) {
     // FIXME use a nicer parser, if destrucuring is not an option
     let split = record.split('/');
@@ -67,69 +74,80 @@ class Zone {
     * @param changes - the object containing records to modify in this zone.
     * @returns new zone object.
     */
-  modify(hostname, changes) {
+  modify(record, changes) {
     // TODO further validate input
     // should be compliant with http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#encoding-in-json
+    // FIXME use a nicer parser, if destrucuring is not an option
+    let split = record.split('/');
+    let proto = split[1];
+    let version = split[2];
+    let rtype = split[3].toLowerCase();
+    let id = split[4];
+
     if (!("RTYPE" in changes)) {
       return {"error": "RTYPE must be specified"};
     }
 
-    this.rtypes.map(type => {
-      let newZone = Object.assign({}, this.cachedZone);
-      if (type == 'A') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.ip = changes.v4address;
-          }
-        });
-      } else if (type == 'AAAA') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.ip = changes.v6address;
-          }
-        });
-      } else if (type == 'CNAME') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.host = changes.ndsname;
-          }
-        });
-      } else if (type == 'NS') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.host = changes.ndsname;
-          }
-        });
-      } else if (type == 'PTR') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.host = changes.ptrdname;
-          }
-        });
-      } else if (type == 'MX') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.preference = changes.preference;
-            entry.exchange = changes.exchange;
-          }
-        });
-      } else if (type == 'SRV') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.priority = changes.priority;
-            entry.weight = changes.weight;
-            entry.target = changes.target;
-          }
-        });
-      } else if (type == 'TXT') {
-        newZone[type].map(entry => {
-          if (entry.name && entry.name == hostname) {
-            entry.data = changes.data;
-          }
-        });
+    if (this.rtypes.indexOf(rtype) == -1) {
+      return {"error": "invalid record type"};
+    }
+
+    if (Object.keys(this.cachedZone).indexOf(rtype) == -1 ||
+        this.cachedZone[rtype].length == 0) {
+      return {"error": "no record types in zone"};
+    }
+
+    let changed = false;
+    this.cachedZone[rtype].map(entry => {
+      if (rtype == 'a') {
+        if (entry.name && entry.name == id) {
+          entry.ip = changes.v4address;
+          changed = true;
+        }
+      } else if (rtype == 'aaaa') {
+        if (entry.name && entry.name == id) {
+          entry.ip = changes.v6address;
+          changed = true;
+        }
+      } else if (rtype == 'cname') {
+        if (entry.name && entry.name == id) {
+          entry.host = changes.ndsname;
+          changed = true;
+        }
+      } else if (rtype == 'ns') {
+        if (entry.name && entry.name == id) {
+          entry.host = changes.ndsname;
+          changed = true;
+        }
+      } else if (rtype == 'ptr') {
+        if (entry.name && entry.name == id) {
+          entry.host = changes.ptrdname;
+          changed = true;
+        }
+      } else if (rtype == 'mx') {
+        if (entry.name && entry.name == id) {
+          entry.preference = changes.preference;
+          entry.exchange = changes.exchange;
+          changed = true;
+        }
+      } else if (rtype == 'srv') {
+        if (entry.name && entry.name == id) {
+          entry.priority = changes.priority;
+          entry.weight = changes.weight;
+          entry.target = changes.target;
+          changed = true;
+        }
+      } else if (rtype == 'txt') {
+        if (entry.name && entry.name == id) {
+          entry.data = changes.data;
+          changed = true;
+        }
       }
-      this.cachedZone = newZone;
     });
+
+    if (!changed) {
+      return {"error": "no matching records found"};
+    }
 
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
@@ -150,7 +168,7 @@ class Zone {
   get authorizedEdits() {
     let result = {};
     this.rtypes.map(type => {
-      result[type] = {
+      result[rtype] = {
         "URI": `http://localhost:8000/deth/v1/${type}`,
         "methods": ["PUT", "DELETE"]
       };
