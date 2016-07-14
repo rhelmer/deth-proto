@@ -55,7 +55,7 @@ TODO support GET on individual record types too.
 
 ## Creating Records
 
-Given a document `create.json` describing the changes:
+Given a document `change.json` describing the changes:
 ```
   {
     "RTYPE": "AAAA",
@@ -66,12 +66,12 @@ Given a document `create.json` describing the changes:
 ```
 If a TTL is not sent with the request, a system default will be used. The response from this PUT will be the JSON form of the record, as inserted. This response MUST have the TTL included.
 ```
-  $ curl -H "Content-Type: application/json" -d @create.json -X POST http://localhost:8000/deth/v1/AAAA/foo.example.com
+  $ curl -H "Content-Type: application/json" -d @create.json -X POST http://localhost:8000/deth/v1/AAAA/www3
 ```
 
 ## Deleting Records
 ```
-  $ curl -H "Content-Type: application/json" -X DELETE http://localhost:8000/deth/v1/AAAA/foo.example.com
+  $ curl -H "Content-Type: application/json" -X DELETE http://localhost:8000/deth/v1/AAAA/www3
 ```
 
 ## Updating Records
