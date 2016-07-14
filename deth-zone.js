@@ -125,6 +125,7 @@ class Zone {
       case 'txt':
         change = {"data": changes.data};
         break;
+      // TODO support rrtypes too, see https://tools.ietf.org/html/rfc3597
       default:
         // shouldn't be reachable
         return {"error": "invalid record type"};
