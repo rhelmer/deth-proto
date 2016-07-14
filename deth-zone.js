@@ -30,7 +30,7 @@ class Zone {
     */
 
   delete(record) {
-    // FIXME use a nicer parser, if destrucuring is not an option
+    // TODO further validate input
     let split = record.split('/');
     let proto = split[1];
     let version = split[2];
@@ -76,7 +76,6 @@ class Zone {
   add(record, changes) {
     // TODO further validate input
     // should be compliant with http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#encoding-in-json
-    // FIXME use a nicer parser, if destrucuring is not an option
     let split = record.split('/');
     let proto = split[1];
     let version = split[2];
@@ -106,7 +105,7 @@ class Zone {
         change = {"ip": changes.v6address};
         break;
       case 'cname':
-        change = {"host": changes.ndsname};
+        change = {"host": changes.cname};
         break;
       case 'ns':
         change = {"host": changes.ndsname};
