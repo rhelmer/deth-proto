@@ -22,10 +22,15 @@ router.route('/deth/v1/*')
 
     let record = req.path;
     let changes = req.body;
-    let output = zone.modify(record, changes);
-
-    res.status(201);
-    res.json(output);
+    try {
+      let output = zone.add(record, changes);
+      res.status(201);
+      res.json(output);
+    } catch (e) {
+      let output = {"error": e.message};
+      res.status(500);
+      res.json(output);
+    }
   })
   .delete(jsonParser, function(req, res, next) {
     if (!req.body) {

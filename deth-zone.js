@@ -63,18 +63,17 @@ class Zone {
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
 
-    // TODO reload DNS server
     return {"message": `deleted ${id} from ${rtype}`};
   }
 
   /**
-    * Modify a zone with new input, save to disk, and reload the DNS server.
+    * Add a record to an existing zone.
     *
-    * @param hostname - a string containing the host name to modify.
-    * @param changes - the object containing records to modify in this zone.
+    * @param hostname - a string containing the host name to add.
+    * @param changes - the object containing records to add in this zone.
     * @returns new zone object.
     */
-  modify(record, changes) {
+  add(record, changes) {
     // TODO further validate input
     // should be compliant with http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#encoding-in-json
     // FIXME use a nicer parser, if destrucuring is not an option
@@ -92,67 +91,52 @@ class Zone {
       return {"error": "invalid record type"};
     }
 
-    if (Object.keys(this.cachedZone).indexOf(rtype) == -1 ||
-        this.cachedZone[rtype].length == 0) {
-      return {"error": "no record types in zone"};
-    }
-
-    let changed = false;
     this.cachedZone[rtype].map(entry => {
-      if (rtype == 'a') {
-        if (entry.name && entry.name == id) {
-          entry.ip = changes.v4address;
-          changed = true;
-        }
-      } else if (rtype == 'aaaa') {
-        if (entry.name && entry.name == id) {
-          entry.ip = changes.v6address;
-          changed = true;
-        }
-      } else if (rtype == 'cname') {
-        if (entry.name && entry.name == id) {
-          entry.host = changes.ndsname;
-          changed = true;
-        }
-      } else if (rtype == 'ns') {
-        if (entry.name && entry.name == id) {
-          entry.host = changes.ndsname;
-          changed = true;
-        }
-      } else if (rtype == 'ptr') {
-        if (entry.name && entry.name == id) {
-          entry.host = changes.ptrdname;
-          changed = true;
-        }
-      } else if (rtype == 'mx') {
-        if (entry.name && entry.name == id) {
-          entry.preference = changes.preference;
-          entry.exchange = changes.exchange;
-          changed = true;
-        }
-      } else if (rtype == 'srv') {
-        if (entry.name && entry.name == id) {
-          entry.priority = changes.priority;
-          entry.weight = changes.weight;
-          entry.target = changes.target;
-          changed = true;
-        }
-      } else if (rtype == 'txt') {
-        if (entry.name && entry.name == id) {
-          entry.data = changes.data;
-          changed = true;
-        }
+      if (entry.name && entry.name == id) {
+        throw Error("record already exists in zone");
       }
     });
 
-    if (!changed) {
-      return {"error": "no matching records found"};
+    let change = {};
+    switch(rtype) {
+      case 'a':
+        change = {"ip": changes.v4address};
+        break;
+      case 'aaaa':
+        change = {"ip": changes.v6address};
+        break;
+      case 'cname':
+        change = {"host": changes.ndsname};
+        break;
+      case 'ns':
+        change = {"host": changes.ndsname};
+        break;
+      case 'ptr':
+        change = {"host": changes.ptrdname};
+        break;
+      case 'mx':
+        change = {"preference": changes.preference,
+                  "exchange": changes.exchange};
+        break;
+      case 'srv':
+        change = {"priority": changes.priority,
+                  "weight": changes.weight,
+                  "target": changes.target};
+        break;
+      case 'txt':
+        change = {"data": changes.data};
+        break;
+      default:
+        // shouldn't be reachable
+        return {"error": "invalid record type"};
     }
+
+    change["name"] = id;
+    this.cachedZone[rtype].push(change);
 
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
 
-    // TODO reload DNS server
     return changes;
   }
 
