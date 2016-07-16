@@ -96,5 +96,5 @@ http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#rfc.section.5.5
 
 In general, errors use the approach from https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03
 
-TODO move from {"error":""} JSON responses to https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03#section-3.1
+TODO move from `{"error":""}` JSON responses to https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03#section-3.1
 
