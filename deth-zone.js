@@ -17,6 +17,7 @@ class Zone {
   constructor(zoneFile) {
     this.zoneFile = zoneFile;
     this.rtypes = ['ns', 'a', 'aaaa', 'cname', 'ns', 'ptr', 'mx', 'srv', 'txt'];
+    // FIXME tighten up unknown RTYPE regex
     this.unknown_rtype = /.*\d.*/;
     let zoneTxt = fs.readFileSync(this.zoneFile, 'utf8');
     this.cachedZone = zonefile.parse(zoneTxt);
