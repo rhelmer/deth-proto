@@ -116,7 +116,6 @@ class Zone {
     // ensure that all required fields were provided
     for (let key in change) {
       if (change.hasOwnProperty(key)) {
-        console.log("rhelmer debug", change[key]);
         if (typeof change[key] == 'undefined') {
           return {"error": "invalid arguments for record type"};
         }
