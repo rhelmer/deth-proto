@@ -4,9 +4,9 @@
   "description": "prototype for DETH protocol https://github.com/hildjj/draft-deth",
   "repository": "https://github.com/rhelmer/deth-proto",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/.bin/mocha tests/"
   },
-  "author": "",
+  "author": "Robert Helmer <rhelmer@mozilla.com>",
   "license": "SEE LICENSE IN http://trustee.ietf.org/docs/IETF-Trust-License-Policy.pdf",
   "dependencies": {
     "body-parser": "^1.15.2",
