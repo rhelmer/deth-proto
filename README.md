@@ -21,12 +21,9 @@ Normally this would be derived using a DNS query:
 Since this is just a prototype, we can assume that the server is authoritative
 for the `example.com` domain.
 
-TODO come up with a better way to prototype realistic behavior locally.
+## Determining authorized edits
 
-## Getting All Records
-
-Current records will be returned along with a list of edits the client
-is authorized to perform.
+A list of edits the client is authorized to perform.
 ```
   $ curl -X GET http://localhost:8000/deth/v1/
 ```
@@ -51,7 +48,11 @@ Might return:
     }
   }
 ```
-TODO support GET on individual record types too.
+
+## Getting Records
+
+TODO not specified yet:
+http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#rfc.section.5.2
 
 ## Creating Records
 
@@ -76,8 +77,11 @@ If a TTL is not sent with the request, a system default will be used. The respon
 
 ## Updating Records
 
-TODO, not specified yet.
+TODO not specified yet:
+http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#rfc.section.5.5
 
 # Return Codes and Errors
 
 In general, errors use the approach from https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03
+
+TODO move from {"error":""} JSON responses to https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03#section-3.1
