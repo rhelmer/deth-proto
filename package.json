@@ -2,6 +2,7 @@
   "name": "deth-proto",
   "version": "1.0.0",
   "description": "prototype for DETH protocol https://github.com/hildjj/draft-deth",
+  "repository": "https://github.com/rhelmer/deth-proto",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -9,7 +10,9 @@
   "license": "SEE LICENSE IN http://trustee.ietf.org/docs/IETF-Trust-License-Policy.pdf",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "chai": "^3.5.0",
     "dns-zonefile": "^0.1.19",
-    "express-api-server": "0.0.8"
+    "express-api-server": "0.0.8",
+    "mocha": "^2.5.3"
   }
 }
