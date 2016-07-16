@@ -184,8 +184,12 @@ class Zone {
       throw Error("invalid record type");
     }
 
+    // see rfc1035 section 2.3.4 Size limits
+    let max_hostname_length = 63;
     let hostname = args[4];
-    // TODO validate hostname
+    if (hostname.length > max_hostname_length) {
+      throw Error("hostname too long");
+    }
 
     let result = {
       "proto": proto,
