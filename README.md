@@ -1,5 +1,5 @@
 Prototype for the DETH (DNS Editing Through HTTPS) spec:
-https://github.com/hildjj/draft-deth
+https://hildjj.github.io/draft-deth/draft-hildebrand-deth.html
 
 # Running
 ```
