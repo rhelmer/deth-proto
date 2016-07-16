@@ -75,6 +75,19 @@ class Zone {
 
     this._validateChanges(changes, rtype)
 
+    // optional TTL
+    let ttl = 3600;
+    if ("TTL" in changeDocument) {
+      // TODO validate that this is a uint
+      ttl = changeDocument["TTL"];
+    }
+
+    // optional comment
+    let comment;
+    if ("comment" in changeDocument) {
+      comment = changeDocument["comment"];
+    }
+
     if (rtype in this.cachedZone) {
       this.cachedZone[rtype].map(entry => {
         if (entry.name && entry.name == hostname) {
@@ -249,16 +262,6 @@ class Zone {
 
     if (changeDocument.RTYPE.toLowerCase() != rtype) {
       return {"error": "RTYPE in document must match rtype in URL"}
-    }
-
-    // optional TTL
-    if (!"TTL" in changeDocument) {
-      // TODO TTL is optional, if not specified then provide
-    }
-
-    // optional comment
-    if (!"comment" in changeDocument) {
-      // TODO add comment to dns-zonefile output
     }
 
     return true;
