@@ -18,7 +18,7 @@ https://hildjj.github.io/draft-deth/draft-hildebrand-deth.html
   $ npm start
 ```
 
-This will start a DNS server and a DETH HTTP server listening on port 8000.
+This will start a DETH HTTP server listening on port 8000.
 
 # Example usage
 
