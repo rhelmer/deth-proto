@@ -176,6 +176,7 @@ class Zone {
     *          as JSON.
     *
     * FIXME needs auth system to do something useful.
+    * TODO add support for unknown record types.
     */
   get authorizedEdits() {
     let result = {};
