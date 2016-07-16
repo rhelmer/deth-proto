@@ -98,18 +98,18 @@ class Zone {
     }
 
     let allowed_changes = {
-      a:     {"ip": changes.v4address},
-      aaaa:  {"ip": changes.v6address},
-      cname: {"host": changes.cname},
-      ns:    {"host": changes.ndsname},
-      ptr:   {"host": changes.ptrdname},
+      a:     {"ip":         changes.v4address},
+      aaaa:  {"ip":         changes.v6address},
+      cname: {"host":       changes.cname},
+      ns:    {"host":       changes.ndsname},
+      ptr:   {"host":       changes.ptrdname},
       mx:    {"preference": changes.preference,
-              "exchange": changes.exchange},
-      srv:   {"priority": changes.priority,
-              "weight": changes.weight,
-              "target": changes.target},
-      txt:   {"txt": changes.data}
-    };
+              "exchange":   changes.exchange},
+      srv:   {"priority":   changes.priority,
+              "weight":     changes.weight,
+              "target":     changes.target},
+      txt:   {"txt":        changes.data}
+    }
 
     let change = allowed_changes[rtype];
 
