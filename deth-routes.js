@@ -38,7 +38,7 @@ router.route('/deth/v1/*')
     }
 
     let record = req.path;
-    let output = zone.delete(record);
+    let output = zone.remove(record);
 
     res.status(200);
     res.json(output);

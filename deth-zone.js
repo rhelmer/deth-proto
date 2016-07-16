@@ -23,13 +23,12 @@ class Zone {
   }
 
   /**
-    * Deletes a record from a zone.
+    * Removes a record from a zone.
     *
     * @param record - the full path to the record to remove.
     * @returns a json error or message with details on actions taken.
     */
-
-  delete(record) {
+  remove(record) {
     // TODO further validate input
     let split = record.split('/');
     let proto = split[1];
@@ -63,7 +62,7 @@ class Zone {
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
 
-    return {"message": `deleted ${id} from ${rtype}`};
+    return {"message": `removed ${id} from ${rtype}`};
   }
 
   /**
