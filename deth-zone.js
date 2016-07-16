@@ -108,7 +108,7 @@ class Zone {
       srv:   {"priority": changes.priority,
               "weight": changes.weight,
               "target": changes.target},
-      txt:   {"data": changes.data}
+      txt:   {"txt": changes.data}
     };
 
     let change = allowed_changes[rtype];
