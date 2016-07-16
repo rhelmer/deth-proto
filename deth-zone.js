@@ -68,15 +68,12 @@ class Zone {
     * @returns new zone object.
     */
   add(record, changes) {
-    // should be compliant with http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#encoding-in-json
     let args = this._parseUrl(record.split('/'));
 
     let rtype = args["rtype"];
     let hostname = args["hostname"];
 
-    if (!("RTYPE" in changes)) {
-      return {"error": "RTYPE must be specified"};
-    }
+    this._validateChanges(changes, rtype)
 
     if (rtype in this.cachedZone) {
       this.cachedZone[rtype].map(entry => {
@@ -161,7 +158,7 @@ class Zone {
    * Validate incoming url and generate result object.
    *
    * @param args - Array containing REST-style URL arguments.
-   * @returns object - contains validated REST-style URL arugments.
+   * @returns object - contains validated REST-style URL arguments.
    * @throws Error if URL is invalid.
    */
   _parseUrl(args) {
@@ -200,5 +197,34 @@ class Zone {
     }
 
     return result;
+  }
+  /**
+   * Validate incoming change document.
+   *
+   * @param changeDocument - original JSON document.
+   * @returns bool - true if valid.
+   * @throws Error if document is invalid.
+   * @see http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#encoding-in-json
+   */
+  _validateChanges(changeDocument, rtype) {
+    if (!"RTYPE" in changeDocument) {
+      return {"error": "RTYPE must be specified"};
+    }
+
+    if (changeDocument.RTYPE.toLowerCase() != rtype) {
+      return {"error": "RTYPE in document must match rtype in URL"}
+    }
+
+    // optional TTL
+    if (!"TTL" in changeDocument) {
+      // TODO TTL is optional, if not specified then provide
+    }
+
+    // optional comment
+    if (!"comment" in changeDocument) {
+      // TODO add comment to dns-zonefile output
+    }
+
+    return true;
   }
 }
