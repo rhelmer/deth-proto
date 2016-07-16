@@ -103,9 +103,95 @@ describe('DethZoneAdd', () => {
     expect(result).to.equal('{"error":"invalid arguments for record type"}');
   });
 
-  it('should return error args rtype does not match document rtype', () => {
+  it('should throw if args record type is incorrect', () => {
     expect(() => {
       zone.add("/deth/v1/ABCD/www2", goodChanges);
     }).to.throw('invalid record type');
   });
+
+  it('should throw if args rtype does not match document rtype', () => {
+    let result = JSON.stringify(zone.add("/deth/v1/AAAA/www2", badChanges));
+    expect(result).to.equal('{"error":"invalid arguments for record type"}');
+  });
+
+  it('should allow adding A records', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'A';
+    delete changes.v6address;
+    changes["v4address"] = '127.0.0.1';
+    let result = JSON.stringify(zone.add("/deth/v1/A/www5", changes));
+    expect(result).to.equal('{"RTYPE":"A","TTL":3600,"comment":"This is my home","v4address":"127.0.0.1"}');
+  });
+
+  it('should allow adding AAAA records', () => {
+    let result = JSON.stringify(zone.add("/deth/v1/AAAA/www5", goodChanges));
+    expect(result).to.equal('{"RTYPE":"AAAA","v6address":"::2","TTL":3600,"comment":"This is my home"}');
+  });
+
+  it('should allow adding CNAME records', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'CNAME';
+    delete changes.v6address;
+    changes["cname"] = 'www1';
+    let result = JSON.stringify(zone.add("/deth/v1/CNAME/www5", changes));
+    expect(result).to.equal('{"RTYPE":"CNAME","TTL":3600,"comment":"This is my home","cname":"www1"}');
+  });
+
+  it('should allow adding NS records', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'NS';
+    delete changes.v6address;
+    changes["ndsname"] = 'ns3.example.com';
+    let result = JSON.stringify(zone.add("/deth/v1/NS/ns3", changes));
+    expect(result).to.equal('{"RTYPE":"NS","TTL":3600,"comment":"This is my home","ndsname":"ns3.example.com"}');
+  });
+
+  it('should allow adding PTR records', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'PTR';
+    delete changes.v6address;
+    changes["ptrdname"] = '1.0.0.127.in-addr.arpa';
+    let result = JSON.stringify(zone.add("/deth/v1/PTR/www1", changes));
+    expect(result).to.equal('{"RTYPE":"PTR","TTL":3600,"comment":"This is my home","ptrdname":"1.0.0.127.in-addr.arpa"}');
+  });
+
+  it('should allow adding MX records', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'MX';
+    delete changes.v6address;
+    changes["preference"] = '0';
+    changes["exchange"] = 'mail.example.com';
+    let result = JSON.stringify(zone.add("/deth/v1/MX/mail", changes));
+    expect(result).to.equal('{"RTYPE":"MX","TTL":3600,"comment":"This is my home","preference":"0","exchange":"mail.example.com"}');
+  });
+
+  it('should allow adding SRV records', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'SRV';
+    delete changes.v6address;
+    changes["priority"] = '0';
+    changes["weight"] = '10';
+    changes["target"] = 'serv1';
+    let result = JSON.stringify(zone.add("/deth/v1/SRV/serv1", changes));
+    expect(result).to.equal('{"RTYPE":"SRV","TTL":3600,"comment":"This is my home","priority":"0","weight":"10","target":"serv1"}');
+  });
+
+  it('should allow adding TXT records', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'TXT';
+    delete changes.v6address;
+    changes["data"] = 'test123';
+    let result = JSON.stringify(zone.add("/deth/v1/TXT/www1", changes));
+    expect(result).to.equal('{"RTYPE":"TXT","TTL":3600,"comment":"This is my home","data":"test123"}');
+  });
+
+  it('should allow unknown record types', () => {
+    let changes = Object.assign({}, goodChanges);
+    changes.RTYPE = 'TYPE255';
+    delete changes.v6address;
+    changes["RDATA"] = 'test123';
+    let result = JSON.stringify(zone.add("/deth/v1/TYPE255/www1", changes));
+    expect(result).to.equal('{"RTYPE":"TYPE255","TTL":3600,"comment":"This is my home","RDATA":"test123"}');
+  });
+
 });
