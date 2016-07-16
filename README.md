@@ -1,6 +1,18 @@
 Prototype for the DETH (DNS Editing Through HTTPS) spec:
 https://hildjj.github.io/draft-deth/draft-hildebrand-deth.html
 
+[![Build Status](https://travis-ci.org/rhelmer/deth-proto.svg?branch=master)](https://travis-ci.org/rhelmer/deth-proto)
+
+# Installing
+```
+  $ npm install
+```
+
+# Running unit tests
+```
+  $ npm test
+```
+
 # Running
 ```
   $ npm start
@@ -86,7 +98,3 @@ In general, errors use the approach from https://tools.ietf.org/html/draft-ietf-
 
 TODO move from {"error":""} JSON responses to https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03#section-3.1
 
-# Running unit tests
-```
-  $ npm test
-```
