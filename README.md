@@ -66,6 +66,27 @@ Might return:
 TODO not specified yet:
 http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#rfc.section.5.2
 
+Individual record types can be queried:
+
+```
+  $ curl -H "Content-Type: application/json" localhost:8000/deth/v1/NS
+```
+
+Might return:
+
+```
+  [
+    {
+      "name": "@",
+      "host": "NS1.EXAMPLE.COM."
+    },
+    {
+      "name": "@",
+      "host": "NS2.EXAMPLE.COM."
+    }
+  ]
+```
+
 ## Creating Records
 
 Given a document `create.json` describing the changes:
