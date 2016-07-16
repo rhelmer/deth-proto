@@ -121,7 +121,9 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["v4address"] = '127.0.0.1';
     let result = JSON.stringify(zone.add("/deth/v1/A/www5", changes));
-    expect(result).to.equal('{"RTYPE":"A","TTL":3600,"comment":"This is my home","v4address":"127.0.0.1"}');
+    expect(result).to.equal(
+      '{"RTYPE":"A","TTL":3600,"comment":"This is my home","v4address":"127.0.0.1"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
@@ -131,7 +133,9 @@ describe('DethZoneAdd', () => {
 
   it('should allow adding AAAA records', () => {
     let result = JSON.stringify(zone.add("/deth/v1/AAAA/www5", goodChanges));
-    expect(result).to.equal('{"RTYPE":"AAAA","v6address":"::2","TTL":3600,"comment":"This is my home"}');
+    expect(result).to.equal(
+      '{"RTYPE":"AAAA","v6address":"::2","TTL":3600,"comment":"This is my home"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
@@ -145,7 +149,9 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["cname"] = 'www1';
     let result = JSON.stringify(zone.add("/deth/v1/CNAME/www5", changes));
-    expect(result).to.equal('{"RTYPE":"CNAME","TTL":3600,"comment":"This is my home","cname":"www1"}');
+    expect(result).to.equal(
+      '{"RTYPE":"CNAME","TTL":3600,"comment":"This is my home","cname":"www1"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
@@ -158,7 +164,9 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["ndsname"] = 'ns3.example.com';
     let result = JSON.stringify(zone.add("/deth/v1/NS/ns3", changes));
-    expect(result).to.equal('{"RTYPE":"NS","TTL":3600,"comment":"This is my home","ndsname":"ns3.example.com"}');
+    expect(result).to.equal(
+      '{"RTYPE":"NS","TTL":3600,"comment":"This is my home","ndsname":"ns3.example.com"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
@@ -171,7 +179,9 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["ptrdname"] = '1.0.0.127.in-addr.arpa';
     let result = JSON.stringify(zone.add("/deth/v1/PTR/www1", changes));
-    expect(result).to.equal('{"RTYPE":"PTR","TTL":3600,"comment":"This is my home","ptrdname":"1.0.0.127.in-addr.arpa"}');
+    expect(result).to.equal(
+      '{"RTYPE":"PTR","TTL":3600,"comment":"This is my home","ptrdname":"1.0.0.127.in-addr.arpa"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
@@ -190,11 +200,15 @@ describe('DethZoneAdd', () => {
     changes["preference"] = '0';
     changes["exchange"] = 'mail.example.com';
     let result = JSON.stringify(zone.add("/deth/v1/MX/mail", changes));
-    expect(result).to.equal('{"RTYPE":"MX","TTL":3600,"comment":"This is my home","preference":"0","exchange":"mail.example.com"}');
+    expect(result).to.equal(
+      '{"RTYPE":"MX","TTL":3600,"comment":"This is my home","preference":"0","exchange":"mail.example.com"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
-    expect(cachedZone['mx']).includes({ name: 'mail', preference: 0, host: 'mail.example.com' });
+    expect(cachedZone['mx']).includes(
+      { name: 'mail', preference: 0, host: 'mail.example.com' }
+    );
   });
 
   it('should allow adding SRV records', () => {
@@ -205,7 +219,9 @@ describe('DethZoneAdd', () => {
     changes["weight"] = '10';
     changes["target"] = 'serv1';
     let result = JSON.stringify(zone.add("/deth/v1/SRV/serv1", changes));
-    expect(result).to.equal('{"RTYPE":"SRV","TTL":3600,"comment":"This is my home","priority":"0","weight":"10","target":"serv1"}');
+    expect(result).to.equal(
+      '{"RTYPE":"SRV","TTL":3600,"comment":"This is my home","priority":"0","weight":"10","target":"serv1"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
@@ -225,7 +241,9 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["data"] = 'test123';
     let result = JSON.stringify(zone.add("/deth/v1/TXT/www1", changes));
-    expect(result).to.equal('{"RTYPE":"TXT","TTL":3600,"comment":"This is my home","data":"test123"}');
+    expect(result).to.equal(
+      '{"RTYPE":"TXT","TTL":3600,"comment":"This is my home","data":"test123"}'
+    );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
@@ -238,7 +256,9 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["RDATA"] = 'test123';
     let result = JSON.stringify(zone.add("/deth/v1/TYPE255/www1", changes));
-    expect(result).to.equal('{"RTYPE":"TYPE255","TTL":3600,"comment":"This is my home","RDATA":"test123"}');
+    expect(result).to.equal(
+      '{"RTYPE":"TYPE255","TTL":3600,"comment":"This is my home","RDATA":"test123"}'
+    );
 
     /* FIXME `dns-zonefile` does not yet support unknown record types
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
@@ -246,5 +266,4 @@ describe('DethZoneAdd', () => {
     expect(cachedZone['type255']).includes({ rdata: '"test123"' });
     */
   });
-
 });
