@@ -55,7 +55,7 @@ TODO support GET on individual record types too.
 
 ## Creating Records
 
-Given a document `change.json` describing the changes:
+Given a document `create.json` describing the changes:
 ```
   {
     "RTYPE": "AAAA",
