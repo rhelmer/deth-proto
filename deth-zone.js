@@ -89,49 +89,46 @@ class Zone {
       return {"error": "invalid record type"};
     }
 
-    this.cachedZone[rtype].map(entry => {
-      if (entry.name && entry.name == id) {
-        throw Error("record already exists in zone");
-      }
-    });
+    if (rtype in this.cachedZone) {
+      this.cachedZone[rtype].map(entry => {
+        if (entry.name && entry.name == id) {
+          throw Error("record already exists in zone");
+        }
+      });
+    }
 
-    let change = {};
-    switch(rtype) {
-      case 'a':
-        change = {"ip": changes.v4address};
-        break;
-      case 'aaaa':
-        change = {"ip": changes.v6address};
-        break;
-      case 'cname':
-        change = {"host": changes.cname};
-        break;
-      case 'ns':
-        change = {"host": changes.ndsname};
-        break;
-      case 'ptr':
-        change = {"host": changes.ptrdname};
-        break;
-      case 'mx':
-        change = {"preference": changes.preference,
-                  "exchange": changes.exchange};
-        break;
-      case 'srv':
-        change = {"priority": changes.priority,
-                  "weight": changes.weight,
-                  "target": changes.target};
-        break;
-      case 'txt':
-        change = {"data": changes.data};
-        break;
-      // TODO support rrtypes too, see https://tools.ietf.org/html/rfc3597
-      default:
-        // shouldn't be reachable
-        return {"error": "invalid record type"};
+    let allowed_changes = {
+      a:     {"ip": changes.v4address},
+      aaaa:  {"ip": changes.v6address},
+      cname: {"host": changes.cname},
+      ns:    {"host": changes.ndsname},
+      ptr:   {"host": changes.ptrdname},
+      mx:    {"preference": changes.preference,
+              "exchange": changes.exchange},
+      srv:   {"priority": changes.priority,
+              "weight": changes.weight,
+              "target": changes.target},
+      txt:   {"data": changes.data}
+    };
+
+    let change = allowed_changes[rtype];
+
+    // ensure that all required fields were provided
+    for (let key in change) {
+      if (change.hasOwnProperty(key)) {
+        console.log("rhelmer debug", change[key]);
+        if (typeof change[key] == 'undefined') {
+          return {"error": "invalid arguments for record type"};
+        }
+      }
     }
 
     change["name"] = id;
-    this.cachedZone[rtype].push(change);
+    if (this.cachedZone[rtype]) {
+      this.cachedZone[rtype].push(change);
+    } else {
+      this.cachedZone[rtype] = [change];
+    }
 
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
