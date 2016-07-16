@@ -86,14 +86,16 @@ class Zone {
     let allowed_changes = {
       a:     {"ip":         changes.v4address},
       aaaa:  {"ip":         changes.v6address},
-      cname: {"host":       changes.cname},
+      cname: {"alias":      changes.cname},
       ns:    {"host":       changes.ndsname},
       ptr:   {"host":       changes.ptrdname},
       mx:    {"preference": changes.preference,
-              "exchange":   changes.exchange},
+              "host":       changes.exchange},
       srv:   {"priority":   changes.priority,
               "weight":     changes.weight,
-              "target":     changes.target},
+              "target":     changes.target,
+              // FIXME add to spec?
+              "port":       "0"},
       txt:   {"txt":        changes.data}
     }
 

@@ -5,6 +5,7 @@ let expect = chai.expect;
 let dethZone = require('../deth-zone');
 let mock = require('mock-fs');
 let fs = require('fs');
+let zonefile = require('dns-zonefile');
 
 const zoneFile = './zones/test-zone.txt';
 const zoneContents = `
@@ -121,11 +122,21 @@ describe('DethZoneAdd', () => {
     changes["v4address"] = '127.0.0.1';
     let result = JSON.stringify(zone.add("/deth/v1/A/www5", changes));
     expect(result).to.equal('{"RTYPE":"A","TTL":3600,"comment":"This is my home","v4address":"127.0.0.1"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).includes({ name: 'www5', ip: '127.0.0.1' });
   });
 
   it('should allow adding AAAA records', () => {
     let result = JSON.stringify(zone.add("/deth/v1/AAAA/www5", goodChanges));
     expect(result).to.equal('{"RTYPE":"AAAA","v6address":"::2","TTL":3600,"comment":"This is my home"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['aaaa']).includes({ name: 'www5', ip: '::2' });
   });
 
   it('should allow adding CNAME records', () => {
@@ -135,6 +146,10 @@ describe('DethZoneAdd', () => {
     changes["cname"] = 'www1';
     let result = JSON.stringify(zone.add("/deth/v1/CNAME/www5", changes));
     expect(result).to.equal('{"RTYPE":"CNAME","TTL":3600,"comment":"This is my home","cname":"www1"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+    expect(cachedZone['cname']).includes({ name: 'www5', alias: 'www1' });
   });
 
   it('should allow adding NS records', () => {
@@ -144,6 +159,10 @@ describe('DethZoneAdd', () => {
     changes["ndsname"] = 'ns3.example.com';
     let result = JSON.stringify(zone.add("/deth/v1/NS/ns3", changes));
     expect(result).to.equal('{"RTYPE":"NS","TTL":3600,"comment":"This is my home","ndsname":"ns3.example.com"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+    expect(cachedZone['ns']).includes({ name: 'ns3', host: 'ns3.example.com' });
   });
 
   it('should allow adding PTR records', () => {
@@ -153,6 +172,15 @@ describe('DethZoneAdd', () => {
     changes["ptrdname"] = '1.0.0.127.in-addr.arpa';
     let result = JSON.stringify(zone.add("/deth/v1/PTR/www1", changes));
     expect(result).to.equal('{"RTYPE":"PTR","TTL":3600,"comment":"This is my home","ptrdname":"1.0.0.127.in-addr.arpa"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+    expect(cachedZone['ptr']).includes(
+      { name: 'www1',
+        fullname: 'www1.0.168.192.IN-ADDR.ARPA.',
+        host: '1.0.0.127.in-addr.arpa'
+      }
+    );
   });
 
   it('should allow adding MX records', () => {
@@ -163,6 +191,10 @@ describe('DethZoneAdd', () => {
     changes["exchange"] = 'mail.example.com';
     let result = JSON.stringify(zone.add("/deth/v1/MX/mail", changes));
     expect(result).to.equal('{"RTYPE":"MX","TTL":3600,"comment":"This is my home","preference":"0","exchange":"mail.example.com"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+    expect(cachedZone['mx']).includes({ name: 'mail', preference: 0, host: 'mail.example.com' });
   });
 
   it('should allow adding SRV records', () => {
@@ -174,6 +206,17 @@ describe('DethZoneAdd', () => {
     changes["target"] = 'serv1';
     let result = JSON.stringify(zone.add("/deth/v1/SRV/serv1", changes));
     expect(result).to.equal('{"RTYPE":"SRV","TTL":3600,"comment":"This is my home","priority":"0","weight":"10","target":"serv1"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+    expect(cachedZone['srv']).includes(
+      { name: 'serv1',
+       target: 'serv1',
+       priority: 0,
+       weight: 10,
+       port: 0,
+     }
+    );
   });
 
   it('should allow adding TXT records', () => {
@@ -183,6 +226,10 @@ describe('DethZoneAdd', () => {
     changes["data"] = 'test123';
     let result = JSON.stringify(zone.add("/deth/v1/TXT/www1", changes));
     expect(result).to.equal('{"RTYPE":"TXT","TTL":3600,"comment":"This is my home","data":"test123"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+    expect(cachedZone['txt']).includes({ name: 'www1', txt: '"test123"' });
   });
 
   it('should allow unknown record types', () => {
@@ -192,6 +239,12 @@ describe('DethZoneAdd', () => {
     changes["RDATA"] = 'test123';
     let result = JSON.stringify(zone.add("/deth/v1/TYPE255/www1", changes));
     expect(result).to.equal('{"RTYPE":"TYPE255","TTL":3600,"comment":"This is my home","RDATA":"test123"}');
+
+    /* FIXME `dns-zonefile` does not yet support unknown record types
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+    expect(cachedZone['type255']).includes({ rdata: '"test123"' });
+    */
   });
 
 });
