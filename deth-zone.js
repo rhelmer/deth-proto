@@ -137,6 +137,38 @@ class Zone {
   }
 
   /**
+    * Handle requests to display data about a particular record type.
+    * @param record - the HTTP REST-style arguments.
+    * @returns JSON representation of record
+    *
+    * FIXME - output is not specified yet.
+    */
+  get(record) {
+    let args = record.split('/');
+
+    if (args.length != 4) {
+      return {"error": "invalid URL"};
+    }
+
+    let rtype = args[3].toLowerCase();
+
+    if (!rtype) {
+      return this.authorizedEdits;
+    }
+
+    if (this.rtypes.indexOf(rtype) == -1) {
+      return {"error": "invalid record type"};
+    }
+
+    if (rtype in this.cachedZone) {
+      console.log("rhelmer debug", this.cachedZone);
+      return this.cachedZone[rtype];
+    } else {
+      return {"error": "no record types found in zone"};
+    }
+  }
+
+  /**
     * Generate an object describing the edits that this client is authorized
     * to perform.
     *
@@ -150,7 +182,7 @@ class Zone {
     this.rtypes.map(rtype => {
       result[rtype] = {
         "URI": `http://localhost:8000/deth/v1/${rtype}`,
-        "methods": ["PUT", "DELETE"]
+        "methods": ["GET", "PUT", "DELETE"]
       };
     });
     return result;

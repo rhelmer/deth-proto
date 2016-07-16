@@ -12,7 +12,7 @@ let zone = dethZone(ZONEFILE);
 
 router.route('/deth/v1/*')
   .get(function(req, res, next) {
-    let output = zone.authorizedEdits;
+    let output = zone.get(req.path);
     res.json(output);
   })
   .post(jsonParser, function(req, res, next) {
