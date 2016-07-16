@@ -1,6 +1,6 @@
 {
-  "RTYPE": "AAAA",
-  "v6address": "::2",
+  "RTYPE": "TYPE255",
+  "RDATA": "::2",
   "TTL": 3600,
   "comment": "This is my home"
 }

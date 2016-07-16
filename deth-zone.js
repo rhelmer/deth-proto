@@ -18,7 +18,7 @@ class Zone {
     this.zoneFile = zoneFile;
     this.rtypes = ['ns', 'a', 'aaaa', 'cname', 'ns', 'ptr', 'mx', 'srv', 'txt'];
     // FIXME tighten up unknown RTYPE regex
-    this.unknown_rtype = /.*\d.*/;
+    this.unknown_rtype = /[A-Za-z].*\d.*/;
     let zoneTxt = fs.readFileSync(this.zoneFile, 'utf8');
     this.cachedZone = zonefile.parse(zoneTxt);
   }
@@ -104,11 +104,12 @@ class Zone {
 
     // handle unknown record types
     // see https://tools.ietf.org/html/rfc3597
-    if (rtype.match(this.unknown_rtype)) {
+    // FIXME `dns-zonefile` doesn't support these, yet
+    if (this.unknown_rtype.test(rtype)) {
       if (!"RDATA" in changes) {
         return {"error": "invalid arguments for new record type"};
       } else {
-        change = {"rdata": changes.rdata};
+        change = {"rdata": changes.RDATA};
       }
     } else {
       change = allowed_changes[rtype];
