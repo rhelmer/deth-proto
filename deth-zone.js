@@ -77,15 +77,15 @@ class Zone {
 
     // optional TTL
     let ttl = 3600;
-    if ("TTL" in changeDocument) {
+    if ("TTL" in changes) {
       // TODO validate that this is a uint
-      ttl = changeDocument["TTL"];
+      ttl = changes["TTL"];
     }
 
     // optional comment
     let comment;
-    if ("comment" in changeDocument) {
-      comment = changeDocument["comment"];
+    if ("comment" in changes) {
+      comment = changes["comment"];
     }
 
     if (rtype in this.cachedZone) {
