@@ -8,7 +8,7 @@ https://hildjj.github.io/draft-deth/draft-hildebrand-deth.html
   $ npm install
 ```
 
-# Tests
+# Testing
 ```
   $ npm test
 ```
