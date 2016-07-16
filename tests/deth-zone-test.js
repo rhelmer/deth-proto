@@ -29,6 +29,7 @@ $TTL 3600
 @	IN	NS	NS2.EXAMPLE.COM.
 
 ; MX Records
+mail IN MX 10 mail.example.com.
 
 ; A Records
 www1	IN	A	127.0.0.1
@@ -39,16 +40,22 @@ www3	IN	AAAA	::1
 www4	IN	AAAA	::1
 
 ; CNAME Records
+www5  CNAME www1
 
 ; PTR Records
 1	IN	PTR	HOST1.EXAMPLE.COM.
 2	IN	PTR	HOST2.EXAMPLE.COM.
 
 ; TXT Records
+text IN TXT "test123"
 
 ; SRV Records
+serv1 86400 IN SRV 10 60 9080 serv2.example.com.
 
 ; SPF Records
+
+; TYPE255
+type1 IN TYPE255 "test123"
 `;
 
 describe('DethZoneAdd', () => {
@@ -148,7 +155,7 @@ describe('DethZoneAdd', () => {
     changes.RTYPE = 'CNAME';
     delete changes.v6address;
     changes["cname"] = 'www1';
-    let result = JSON.stringify(zone.add("/deth/v1/CNAME/www5", changes));
+    let result = JSON.stringify(zone.add("/deth/v1/CNAME/www6", changes));
     expect(result).to.equal(
       '{"RTYPE":"CNAME","TTL":3600,"comment":"This is my home","cname":"www1"}'
     );
@@ -199,7 +206,7 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["preference"] = '0';
     changes["exchange"] = 'mail.example.com';
-    let result = JSON.stringify(zone.add("/deth/v1/MX/mail", changes));
+    let result = JSON.stringify(zone.add("/deth/v1/MX/mail2", changes));
     expect(result).to.equal(
       '{"RTYPE":"MX","TTL":3600,"comment":"This is my home","preference":"0","exchange":"mail.example.com"}'
     );
@@ -207,7 +214,7 @@ describe('DethZoneAdd', () => {
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
     expect(cachedZone['mx']).includes(
-      { name: 'mail', preference: 0, host: 'mail.example.com' }
+      { name: 'mail2', preference: 0, host: 'mail.example.com' }
     );
   });
 
@@ -217,17 +224,17 @@ describe('DethZoneAdd', () => {
     delete changes.v6address;
     changes["priority"] = '0';
     changes["weight"] = '10';
-    changes["target"] = 'serv1';
-    let result = JSON.stringify(zone.add("/deth/v1/SRV/serv1", changes));
+    changes["target"] = 'serv3';
+    let result = JSON.stringify(zone.add("/deth/v1/SRV/serv2", changes));
     expect(result).to.equal(
-      '{"RTYPE":"SRV","TTL":3600,"comment":"This is my home","priority":"0","weight":"10","target":"serv1"}'
+      '{"RTYPE":"SRV","TTL":3600,"comment":"This is my home","priority":"0","weight":"10","target":"serv3"}'
     );
 
     let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
     let cachedZone = zonefile.parse(zoneTxt);
     expect(cachedZone['srv']).includes(
-      { name: 'serv1',
-       target: 'serv1',
+      { name: 'serv2',
+       target: 'serv3',
        priority: 0,
        weight: 10,
        port: 0,
@@ -266,4 +273,138 @@ describe('DethZoneAdd', () => {
     expect(cachedZone['type255']).includes({ rdata: '"test123"' });
     */
   });
+});
+
+describe('DethZoneRemove', () => {
+
+  let zone;
+
+  beforeEach(() => {
+    // mock `fs` module
+    mock();
+    fs.mkdir('./zones');
+    fs.writeFileSync(zoneFile, zoneContents);
+
+    zone = dethZone(zoneFile);
+  });
+
+  afterEach(mock.restore);
+
+  it('should throw if invalid URL arguments are sent', () => {
+    expect(() => {
+      zone.remove("/lyfe/v1/AAAA/www2");
+    }).to.throw('only deth protocol is supported');
+
+    expect(() => {
+      zone.remove("/deth/v2/AAAA/www2");
+    }).to.throw('only version v1 is supported');
+
+    expect(() => {
+      zone.remove("/deth/v2/ABCD");
+    }).to.throw('invalid URL');
+  });
+
+  it('should return an error trying to remove a non-existent record', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/A/www5"));
+    expect(result).to.equal('{"error":"no matching records found in zone"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'www5', ip: '127.0.0.1' });
+  });
+
+  it('should allow removing A records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/A/www1"));
+    expect(result).to.equal('{"message":"removed www1 from a"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'www1', ip: '127.0.0.1' });
+  });
+
+  it('should allow removing AAAA records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/AAAA/www3"));
+    expect(result).to.equal('{"message":"removed www3 from aaaa"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'www3', ip: '::1' });
+  });
+
+
+  it('should allow removing CNAME records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/CNAME/www5"));
+    expect(result).to.equal('{"message":"removed www5 from cname"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'www5', alias: 'www1' });
+  });
+
+  it('should allow removing NS records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/NS/@"));
+    expect(result).to.equal('{"message":"removed @ from ns"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'www5', alias: 'www1' });
+  });
+
+  it('should allow removing PTR records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/PTR/1"));
+    expect(result).to.equal('{"message":"removed 1 from ptr"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'www5', alias: 'www1' });
+  });
+
+  it('should allow removing MX records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/MX/mail"));
+    expect(result).to.equal('{"message":"removed mail from mx"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'mail', preference: 10, host: 'mail' });
+  });
+
+  it('should allow removing SRV records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/SRV/serv1"));
+    expect(result).to.equal('{"message":"removed serv1 from srv"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'mail', preference: 10, host: 'mail' });
+  });
+
+  it('should allow removing TXT records', () => {
+    let result = JSON.stringify(zone.remove("/deth/v1/TXT/text"));
+    expect(result).to.equal('{"message":"removed text from txt"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'text', txt: '"test123"' });
+  });
+
+  it('should allow removing unknown records', () => {
+    /* FIXME `dns-zonefile` cannot handle these yet
+    let result = JSON.stringify(zone.remove("/deth/v1/TYPE255/test123"));
+    expect(result).to.equal('{"message":"removed test123 from type255"}');
+
+    let zoneTxt = fs.readFileSync(zoneFile, 'utf8');
+    let cachedZone = zonefile.parse(zoneTxt);
+
+    expect(cachedZone['a']).not.includes({ name: 'test123', rdata: '"test123"' });
+    */
+  });
+
 });
