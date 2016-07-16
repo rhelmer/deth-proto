@@ -29,13 +29,10 @@ class Zone {
     * @returns a json error or message with details on actions taken.
     */
   remove(record) {
-    let args = record.split('/');
-    this._validateUrl(args);
+    let args = this._parseUrl(record.split('/'));
 
-    let proto = args[1];
-    let version = args[2];
-    let rtype = args[3].toLowerCase();
-    let hostname = args[4];
+    let rtype = args["rtype"];
+    let hostname = args["hostname"];
 
     if (Object.keys(this.cachedZone).indexOf(rtype) == -1 ||
         this.cachedZone[rtype].length == 0) {
@@ -71,13 +68,10 @@ class Zone {
     */
   add(record, changes) {
     // should be compliant with http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#encoding-in-json
-    let args = record.split('/');
-    this._validateUrl(args);
+    let args = this._parseUrl(record.split('/'));
 
-    let proto = args[1];
-    let version = args[2];
-    let rtype = args[3].toLowerCase();
-    let hostname = args[4];
+    let rtype = args["rtype"];
+    let hostname = args["hostname"];
 
     if (!("RTYPE" in changes)) {
       return {"error": "RTYPE must be specified"};
@@ -162,13 +156,13 @@ class Zone {
   }
 
   /**
-   * Validate incoming url arguments.
+   * Validate incoming url and generate result object.
    *
    * @param args - Array containing REST-style URL arguments.
-   * @returns bool - true if valid.
+   * @returns object - contains validated REST-style URL arugments.
    * @throws Error if URL is invalid.
    */
-  _validateUrl(args) {
+  _parseUrl(args) {
     if (args.length != 5) {
       throw Error("invalid URL");
     }
@@ -191,5 +185,14 @@ class Zone {
 
     let hostname = args[4];
     // TODO validate hostname
+
+    let result = {
+      "proto": proto,
+      "version": version,
+      "rtype": rtype,
+      "hostname": hostname,
+    }
+
+    return result;
   }
 }
