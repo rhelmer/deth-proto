@@ -16,8 +16,8 @@ module.exports = function create(opt) {
 class Zone {
   constructor(zoneFile) {
     this.zoneFile = zoneFile;
-    // TODO add support for rrtype_update, see https://tools.ietf.org/html/rfc3597
     this.rtypes = ['ns', 'a', 'aaaa', 'cname', 'ns', 'ptr', 'mx', 'srv', 'txt'];
+    this.unknown_rtype = /.*\d.*/;
     let zoneTxt = fs.readFileSync(this.zoneFile, 'utf8');
     this.cachedZone = zonefile.parse(zoneTxt);
   }
@@ -29,16 +29,13 @@ class Zone {
     * @returns a json error or message with details on actions taken.
     */
   remove(record) {
-    // TODO further validate input
-    let split = record.split('/');
-    let proto = split[1];
-    let version = split[2];
-    let rtype = split[3].toLowerCase();
-    let id = split[4];
+    let args = record.split('/');
+    this._validateUrl(args);
 
-    if (this.rtypes.indexOf(rtype) == -1) {
-      return {"error": "invalid record type"};
-    }
+    let proto = args[1];
+    let version = args[2];
+    let rtype = args[3].toLowerCase();
+    let hostname = args[4];
 
     if (Object.keys(this.cachedZone).indexOf(rtype) == -1 ||
         this.cachedZone[rtype].length == 0) {
@@ -49,7 +46,7 @@ class Zone {
     for (let i = this.cachedZone[rtype].length - 1; i >= 0; i--) {
       if (this.cachedZone[rtype][i] &&
           "name" in this.cachedZone[rtype][i] &&
-          this.cachedZone[rtype][i]["name"] == id) {
+          this.cachedZone[rtype][i]["name"] == hostname) {
         delete this.cachedZone[rtype][i];
         changed = true;
       }
@@ -62,7 +59,7 @@ class Zone {
     // save new zone file to disk
     fs.writeFileSync(this.zoneFile, zonefile.generate(this.cachedZone), 'utf8');
 
-    return {"message": `removed ${id} from ${rtype}`};
+    return {"message": `removed ${hostname} from ${rtype}`};
   }
 
   /**
@@ -73,25 +70,22 @@ class Zone {
     * @returns new zone object.
     */
   add(record, changes) {
-    // TODO further validate input
     // should be compliant with http://hildjj.github.io/draft-deth/draft-hildebrand-deth.html#encoding-in-json
-    let split = record.split('/');
-    let proto = split[1];
-    let version = split[2];
-    let rtype = split[3].toLowerCase();
-    let id = split[4];
+    let args = record.split('/');
+    this._validateUrl(args);
+
+    let proto = args[1];
+    let version = args[2];
+    let rtype = args[3].toLowerCase();
+    let hostname = args[4];
 
     if (!("RTYPE" in changes)) {
       return {"error": "RTYPE must be specified"};
     }
 
-    if (this.rtypes.indexOf(rtype) == -1) {
-      return {"error": "invalid record type"};
-    }
-
     if (rtype in this.cachedZone) {
       this.cachedZone[rtype].map(entry => {
-        if (entry.name && entry.name == id) {
+        if (entry.name && entry.name == hostname) {
           throw Error("record already exists in zone");
         }
       });
@@ -111,7 +105,19 @@ class Zone {
       txt:   {"txt":        changes.data}
     }
 
-    let change = allowed_changes[rtype];
+    let change = {};
+
+    // handle unknown record types
+    // see https://tools.ietf.org/html/rfc3597
+    if (rtype.match(this.unknown_rtype)) {
+      if (!"RDATA" in changes) {
+        return {"error": "invalid arguments for new record type"};
+      } else {
+        change = {"rdata": changes.rdata};
+      }
+    } else {
+      change = allowed_changes[rtype];
+    }
 
     // ensure that all required fields were provided
     for (let key in change) {
@@ -122,7 +128,7 @@ class Zone {
       }
     }
 
-    change["name"] = id;
+    change["name"] = hostname;
     if (this.cachedZone[rtype]) {
       this.cachedZone[rtype].push(change);
     } else {
@@ -153,5 +159,37 @@ class Zone {
       };
     });
     return result;
+  }
+
+  /**
+   * Validate incoming url arguments.
+   *
+   * @param args - Array containing REST-style URL arguments.
+   * @returns bool - true if valid.
+   * @throws Error if URL is invalid.
+   */
+  _validateUrl(args) {
+    if (args.length != 5) {
+      throw Error("invalid URL");
+    }
+
+    let proto = args[1];
+    if (proto != 'deth') {
+      throw Error("only deth protocol is supported");
+    }
+
+    let version = args[2];
+    if (version != 'v1') {
+      throw Error("only version v1 is supported");
+    }
+
+    let rtype = args[3].toLowerCase();
+    if (this.rtypes.indexOf(rtype) == -1 &&
+        !this.unknown_rtype.test(rtype)) {
+      throw Error("invalid record type");
+    }
+
+    let hostname = args[4];
+    // TODO validate hostname
   }
 }
