@@ -13,6 +13,7 @@
     "chai": "^3.5.0",
     "dns-zonefile": "^0.1.19",
     "express-api-server": "0.0.8",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "mock-fs": "^3.11.0"
   }
 }
